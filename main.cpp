@@ -4,6 +4,7 @@
 using namespace std;
 
 enum colors { Black = 0, White = 1 };
+enum pieces { King = 0, Queen = 1, Bishop = 2, Knight = 3, Rook = 4, Pawn = 5 };
 
 const string ColorStrings[2] = { "Black","White" };
 
@@ -54,6 +55,11 @@ public:
 		col = (input[0] <= 'h' && input[0] >= 'a') ? input[0] - 'a' : input[0] - 'A';
 		return true;
 	}
+	Position operator=(Position other)
+	{
+		row = other.getRow();
+		col = other.getCol();
+	}
 private:
 	int row;
 	int col;
@@ -82,7 +88,7 @@ private:
 class ChessPiece
 {
 public:
-	ChessPiece(colors color, int row, int col) :color(color), curPosition(row, col), possibleMoves(nullptr) {}
+	ChessPiece(colors color, int row, int col, pieces piece = King) :color(color), curPosition(row, col), possibleMoves(nullptr), piece(piece) {}
 	~ChessPiece()
 	{
 		if (nullptr != possibleMoves) delete(possibleMoves);
@@ -100,18 +106,21 @@ public:
 		return false;
 	}
 	colors getColor() { return color; }
+	pieces getPiece() { return piece; }
+	PositionNode * getPossibleMoves() { return possibleMoves; }
 	virtual void addAllPossibleMoves() = 0;
 	virtual void printPiece() = 0;
 private:
 	const colors color;
+	const pieces piece;
 	Position curPosition;
 	PositionNode* possibleMoves;
 };
 
-class King :public ChessPiece
+class KingPiece :public ChessPiece
 {
 public:
-	King(colors color, int row, int col) :ChessPiece(color, row, col) {}
+	KingPiece(colors color, int row, int col, pieces piece = King) :ChessPiece(color, row, col, piece) {}
 	void addAllPossibleMoves()
 	{
 
@@ -123,10 +132,10 @@ public:
 	}
 };
 
-class Queen :public ChessPiece
+class QueenPiece :public ChessPiece
 {
 public:
-	Queen(colors color, int row, int col) :ChessPiece(color, row, col) {}
+	QueenPiece(colors color, int row, int col, pieces piece = Queen) :ChessPiece(color, row, col, piece) {}
 	void addAllPossibleMoves()
 	{
 
@@ -138,10 +147,10 @@ public:
 	}
 };
 
-class Bishop :public ChessPiece
+class BishopPiece :public ChessPiece
 {
 public:
-	Bishop(colors color, int row, int col) :ChessPiece(color, row, col) {}
+	BishopPiece(colors color, int row, int col, pieces piece = Bishop) :ChessPiece(color, row, col, piece) {}
 	void addAllPossibleMoves()
 	{
 
@@ -153,10 +162,10 @@ public:
 	}
 };
 
-class Knight :public ChessPiece
+class KnightPiece :public ChessPiece
 {
 public:
-	Knight(colors color, int row, int col) :ChessPiece(color, row, col) {}
+	KnightPiece(colors color, int row, int col, pieces piece = Knight) :ChessPiece(color, row, col, piece) {}
 	void addAllPossibleMoves()
 	{
 
@@ -168,10 +177,10 @@ public:
 	}
 };
 
-class Rook :public ChessPiece
+class RookPiece :public ChessPiece
 {
 public:
-	Rook(colors color, int row, int col) :ChessPiece(color, row, col) {}
+	RookPiece(colors color, int row, int col, pieces piece = Rook) :ChessPiece(color, row, col, piece) {}
 	void addAllPossibleMoves()
 	{
 
@@ -179,14 +188,14 @@ public:
 	void printPiece()
 	{
 		if (this->getColor() == Black) cout << "BR";
-		else                cout << "WR";
+		else					       cout << "WR";
 	}
 };
 
-class Pawn :public ChessPiece
+class PawnPiece :public ChessPiece
 {
 public:
-	Pawn(colors color, int row, int col) :ChessPiece(color, row, col) {}
+	PawnPiece(colors color, int row, int col, pieces piece = Pawn) :ChessPiece(color, row, col, piece) {}
 	void addAllPossibleMoves()
 	{
 
@@ -194,7 +203,7 @@ public:
 	void printPiece()
 	{
 		if (this->getColor() == Black) cout << "BP";
-		else                cout << "WP";
+		else						   cout << "WP";
 	}
 };
 
@@ -203,25 +212,25 @@ class ChessBoard
 public:
 	ChessBoard()
 	{
-		Board[0][0] = new Rook(White, 0, 0);
-		Board[0][1] = new Knight(White, 0, 1);
-		Board[0][2] = new Bishop(White, 0, 2);
-		Board[0][3] = new Queen(White, 0, 3);
-		Board[0][4] = new King(White, 0, 4);
-		Board[0][5] = new Bishop(White, 0, 5);
-		Board[0][6] = new Knight(White, 0, 6);
-		Board[0][7] = new Rook(White, 0, 7);
-		Board[7][0] = new Rook(Black, 7, 0);
-		Board[7][1] = new Knight(Black, 7, 1);
-		Board[7][2] = new Bishop(Black, 7, 2);
-		Board[7][3] = new Queen(Black, 7, 3);
-		Board[7][4] = new King(Black, 7, 4);
-		Board[7][5] = new Bishop(Black, 7, 5);
-		Board[7][6] = new Knight(Black, 7, 6);
-		Board[7][7] = new Rook(Black, 7, 7);
+		Board[0][0] = new RookPiece(White, 0, 0);
+		Board[0][1] = new KnightPiece(White, 0, 1);
+		Board[0][2] = new BishopPiece(White, 0, 2);
+		Board[0][3] = new QueenPiece(White, 0, 3);
+		Board[0][4] = new KingPiece(White, 0, 4);
+		Board[0][5] = new BishopPiece(White, 0, 5);
+		Board[0][6] = new KnightPiece(White, 0, 6);
+		Board[0][7] = new RookPiece(White, 0, 7);
+		Board[7][0] = new RookPiece(Black, 7, 0);
+		Board[7][1] = new KnightPiece(Black, 7, 1);
+		Board[7][2] = new BishopPiece(Black, 7, 2);
+		Board[7][3] = new QueenPiece(Black, 7, 3);
+		Board[7][4] = new KingPiece(Black, 7, 4);
+		Board[7][5] = new BishopPiece(Black, 7, 5);
+		Board[7][6] = new KnightPiece(Black, 7, 6);
+		Board[7][7] = new RookPiece(Black, 7, 7);
 
-		for (int i = 0; i < 8; i++) Board[1][i] = new Pawn(White, 1, i);
-		for (int i = 0; i < 8; i++) Board[6][i] = new Pawn(Black, 6, i);
+		for (int i = 0; i < 8; i++) Board[1][i] = new PawnPiece(White, 1, i);
+		for (int i = 0; i < 8; i++) Board[6][i] = new PawnPiece(Black, 6, i);
 
 		for (int i = 2; i < 6; i++) for (int j = 0; j < 8; j++) Board[i][j] = nullptr;
 
@@ -247,6 +256,128 @@ public:
 		}
 		cout << endl << "-----------------------------------------" << endl;
 	}
+
+	bool isCheck(colors color)
+	{
+		Position pointToCheck = (color == Black) ? BlackKing : WhiteKing;
+		return false;
+	}
+
+	bool isEmpty(Position * choice) { return (Board[choice->getRow()][choice->getCol()] == nullptr); }
+
+	bool isOppositeColor(Position * choice)
+	{
+		return (Board[choice->getRow()][choice->getCol()]->getColor() != curTurn);
+	}
+
+	bool isLegalPiece(Position * pickUp)
+	{
+		int row = pickUp->getRow(), col = pickUp->getCol();
+		ChessPiece * curPiece = Board[pickUp->getRow()][pickUp->getCol()];
+		if (isEmpty(pickUp))
+		{
+			cout << "There is no piece there!" << endl;
+			return false;
+		}
+		if (isOppositeColor(pickUp))
+		{
+			cout << "Piece is of the opposite color." << endl;
+			return false;
+		}
+		Board[row][col] = nullptr;
+		bool cannotMove = isCheck(curTurn);
+		Board[row][col] = curPiece;
+		if (cannotMove)
+		{
+			cout << "Moving this piece exposes your king to a threat." << endl;
+			return false;
+		}
+		curPiece->addAllPossibleMoves();
+		if (curPiece->getPossibleMoves() == nullptr)
+		{
+			cout << "This piece has no legal moves available." << endl;
+			return false;
+		}
+		return true;
+	}
+
+	Position * pickUpPiece()
+	{
+		Position * choice = new Position;
+		bool userChoseLegalPiece = false;
+		cout << "Next move: " << ColorStrings[curTurn] << endl;
+		while (!userChoseLegalPiece)
+		{
+			while (!choice->getFromUser()) cout << "Try again:" << endl;
+			if (!isLegalPiece(choice)) cout << "Try again:" << endl;
+			else userChoseLegalPiece = true;
+		}
+		return choice;
+	}
+
+	void createNewPiece(Position * target)
+	{
+		bool userEntryCorrect = false;
+		string entry;
+		cout << "Choose piece to turn into: (Q - Queen, R - Rook, B - Bishop, K - Knight)" << endl;
+		while (!userEntryCorrect)
+		{
+			cin >> entry;
+			if (entry.length() != 1)
+			{
+				cout << "Must be a single letter... (Q/R/B/K)" << endl;
+				continue;
+			}
+
+		}
+	}
+
+	void movePiece(Position * origin)
+	{
+		Position * target;
+		ChessPiece * movingPiece = Board[origin->getRow()][origin->getCol()];
+		bool userChoseLegalTarget = false;
+		cout << "Move where?" << endl;
+		while (!userChoseLegalTarget)
+		{
+			while (!target->getFromUser()) cout << "Try again:" << endl;
+			if (!movingPiece->isLegalMove(*target)) cout << "Try again:" << endl;
+			else userChoseLegalTarget = true;
+		}
+		if (nullptr != Board[target->getRow()][target->getCol()])
+			delete(Board[target->getRow()][target->getCol()]);
+		Board[target->getRow()][target->getCol()] = movingPiece;
+		Board[origin->getRow()][origin->getCol()] = nullptr;
+		if (movingPiece->getPiece() == Pawn && ((movingPiece->getColor() == Black && target->getRow() == 0) ||
+			(movingPiece->getColor() == White && target->getRow() == 7)))
+		{
+			cout << "Choose piece to turn into: (Q - Queen, R - Rook, B - Bishop, K - Knight)" << endl;
+			
+		}
+	}
+	
+	bool isCheckMate(colors opponent)
+	{
+	    return false;
+	}
+
+	bool nextTurn()
+	{
+		Position * pieceToMove = pickUpPiece();
+		colors opponent = curTurn == Black ? White : Black;
+		movePiece(pieceToMove);
+		if (isCheck(opponent))
+		{
+			if (isCheckMate(opponent))
+			{
+				cout << "Checkmate!!! " << ColorStrings[curTurn] << " wins!!!" << endl;
+				return true;
+			}
+			cout << "Check!" << endl;
+		}
+		return false;
+	}
+
 private:
 	ChessPiece * Board[8][8];
 	Position	 WhiteKing;
