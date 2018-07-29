@@ -93,10 +93,10 @@ public:
 	{
 		if (nullptr != possibleMoves) delete(possibleMoves);
 	}
-	bool isLegalMove(Position target)
+	bool isLegalMove(Position * target)
 	{
-		PositionNode* check = possibleMoves;
-		PositionNode* targetNode = new PositionNode(target.getRow(), target.getCol());
+		PositionNode * check = possibleMoves;
+		PositionNode * targetNode = new PositionNode(target->getRow(), target->getCol());
 		while (check != nullptr)
 		{
 			if (check == targetNode) return true;
@@ -128,7 +128,7 @@ public:
 	void printPiece()
 	{
 		if (this->getColor() == Black) cout << "BK";
-		else                cout << "WK";
+		else                           cout << "WK";
 	}
 };
 
@@ -143,7 +143,7 @@ public:
 	void printPiece()
 	{
 		if (this->getColor() == Black) cout << "BQ";
-		else                cout << "WQ";
+		else                           cout << "WQ";
 	}
 };
 
@@ -158,7 +158,7 @@ public:
 	void printPiece()
 	{
 		if (this->getColor() == Black) cout << "BB";
-		else                cout << "WB";
+		else                           cout << "WB";
 	}
 };
 
@@ -173,7 +173,7 @@ public:
 	void printPiece()
 	{
 		if (this->getColor() == Black) cout << "BH";
-		else                cout << "WH";
+		else                           cout << "WH";
 	}
 };
 
@@ -259,8 +259,14 @@ public:
 
 	bool isCheck(colors color)
 	{
-		Position pointToCheck = (color == Black) ? BlackKing : WhiteKing;
+		Position kingPosition = (color == Black) ? BlackKing : WhiteKing;
 		return false;
+	}
+	
+	bool isCheckMate(colors color)
+	{
+		Position kingPosition = (color == Black) ? BlackKing : WhiteKing;
+	    return false;
 	}
 
 	bool isEmpty(Position * choice) { return (Board[choice->getRow()][choice->getCol()] == nullptr); }
@@ -289,7 +295,7 @@ public:
 		Board[row][col] = curPiece;
 		if (cannotMove)
 		{
-			cout << "Moving this piece exposes your king to a threat." << endl;
+			cout << "Moving this piece leaves your King in check." << endl;
 			return false;
 		}
 		curPiece->addAllPossibleMoves();
@@ -318,30 +324,48 @@ public:
 	void createNewPiece(Position * target)
 	{
 		bool userEntryCorrect = false;
-		string entry;
+		char entry;
+		
+		cout << "Pawn reached end of board!" << endl;
 		cout << "Choose piece to turn into: (Q - Queen, R - Rook, B - Bishop, K - Knight)" << endl;
 		while (!userEntryCorrect)
 		{
 			cin >> entry;
-			if (entry.length() != 1)
-			{
-				cout << "Must be a single letter... (Q/R/B/K)" << endl;
-				continue;
-			}
-
+            switch (entry)
+            {
+                case 'Q':
+				Board[target->getRow()][target->getCol()] = new QueenPiece(curTurn, target->getRow(), target->getCol());
+				userEntryCorrect = true;
+                break;
+                case 'R':
+				Board[target->getRow()][target->getCol()] = new RookPiece(curTurn, target->getRow(), target->getCol());
+				userEntryCorrect = true;
+                break;
+                case 'B':
+				Board[target->getRow()][target->getCol()] = new BishopPiece(curTurn, target->getRow(), target->getCol());
+				userEntryCorrect = true;
+                break;
+                case 'K':
+				Board[target->getRow()][target->getCol()] = new KnightPiece(curTurn, target->getRow(), target->getCol());
+				userEntryCorrect = true;
+                break;
+                default:
+                cout << "Input must be Q, R, B or K." << endl;
+            }
 		}
 	}
 
-	void movePiece(Position * origin)
+	bool movePiece(Position * origin)
 	{
 		Position * target;
 		ChessPiece * movingPiece = Board[origin->getRow()][origin->getCol()];
 		bool userChoseLegalTarget = false;
+		colors opponent = (curTurn == Black) ? White : Black;
 		cout << "Move where?" << endl;
 		while (!userChoseLegalTarget)
 		{
 			while (!target->getFromUser()) cout << "Try again:" << endl;
-			if (!movingPiece->isLegalMove(*target)) cout << "Try again:" << endl;
+			if (!movingPiece->isLegalMove(target)) cout << "Try again:" << endl;
 			else userChoseLegalTarget = true;
 		}
 		if (nullptr != Board[target->getRow()][target->getCol()])
@@ -351,14 +375,26 @@ public:
 		if (movingPiece->getPiece() == Pawn && ((movingPiece->getColor() == Black && target->getRow() == 0) ||
 			(movingPiece->getColor() == White && target->getRow() == 7)))
 		{
-			cout << "Choose piece to turn into: (Q - Queen, R - Rook, B - Bishop, K - Knight)" << endl;
-			
+			delete(movingPiece);
+			createNewPiece(target);
 		}
-	}
-	
-	bool isCheckMate(colors opponent)
-	{
-	    return false;
+		else if (movingPiece->getPiece() == King)
+		{
+			if (curTurn == Black) BlackKing = *target;
+			else                  WhiteKing = *target;
+		}
+		
+		if (isCheck(opponent))
+		{
+			if (isCheckMate(opponent))
+			{
+				cout << "Checkmate!!! " << ColorStrings[curTurn] << " wins!!!" << endl;
+				return true;
+			}
+			cout << "Check!" << endl;
+		}
+		
+		return false;
 	}
 
 	bool nextTurn()
