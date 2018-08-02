@@ -11,6 +11,34 @@ const string ColorStrings[2] = { "Black","White" };
 const int MAX_POSITION = 7;
 const int MIN_POSITION = 0;
 
+class Color
+{
+public:
+	Color(colors color = White) :color(color) {};
+
+	colors getColor() { return color; }
+
+	string colorStr() { return ColorStrings[color]; }
+
+	void printColor() { cout << ColorStrings[color]; }
+	
+	Color& operator++()
+	{
+		this->color = (this->color + 1) % 2;
+		return *this;
+	}
+
+	Color operator++(Color * old)
+	{
+		Color ret(this->color);
+		++(*old);
+		return ret;
+	}
+
+private:
+	colors color;
+};
+
 class Position
 {
 public:
