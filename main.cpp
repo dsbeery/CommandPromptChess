@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include "baseClasses.h"
+#include "chessPiece.h"
+#include "chessBoard.h"
 
 using namespace std;
 
@@ -24,14 +27,14 @@ public:
 	
 	Color& operator++()
 	{
-		this->color = (this->color + 1) % 2;
+		this->color = (colors)(((int)this->color + 1) % 2);
 		return *this;
 	}
 
-	Color operator++(Color * old)
+	Color operator++(int)
 	{
 		Color ret(this->color);
-		++(*old);
+		++(*this);
 		return ret;
 	}
 
