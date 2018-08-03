@@ -10,9 +10,9 @@ public:
 
 	void printBoard();
 
-	bool isCheck(colors color);
+	bool isCheck(Color color);
 
-	bool isCheckMate(colors color);
+	bool isCheckMate(Color color);
 
 	bool isEmpty(Position * choice);
 
@@ -32,7 +32,7 @@ private:
 	ChessPiece * Board[8][8];
 	Position	 WhiteKing;
 	Position	 BlackKing;
-	colors       curTurn;
+	Color        curTurn;
 };
 
 #endif // CHESS_BOARD_H

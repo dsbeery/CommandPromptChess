@@ -28,7 +28,7 @@ ChessBoard::ChessBoard()
 	WhiteKing.setPosition(0, 4);
 	BlackKing.setPosition(7, 4);
 
-	curTurn = White;
+	if (curTurn.getColor() != White) cout << "Initial color mismatch" << endl;
 }
 
 void ChessBoard::printBoard()
@@ -48,15 +48,15 @@ void ChessBoard::printBoard()
 	cout << endl << "-----------------------------------------" << endl;
 }
 
-bool ChessBoard::isCheck(colors color)
+bool ChessBoard::isCheck(Color color)
 {
-	Position kingPosition = (color == Black) ? BlackKing : WhiteKing;
+	Position kingPosition = (color == Color(Black)) ? BlackKing : WhiteKing;
 	return false;
 }
 
-bool ChessBoard::isCheckMate(colors color)
+bool ChessBoard::isCheckMate(Color color)
 {
-	Position kingPosition = (color == Black) ? BlackKing : WhiteKing;
+	Position kingPosition = (color == Color(Black)) ? BlackKing : WhiteKing;
 	return false;
 }
 
@@ -105,7 +105,7 @@ Position * ChessBoard::pickUpPiece()
 {
 	Position * choice = new Position;
 	bool userChoseLegalPiece = false;
-	cout << "Next move: " << ColorStrings[curTurn] << endl;
+	cout << "Next move: " << ColorStrings[curTurn.getColor()] << endl;
 	while (!userChoseLegalPiece)
 	{
 		while (!choice->getFromUser()) cout << "Try again:" << endl;
@@ -128,19 +128,19 @@ void ChessBoard::createNewPiece(Position * target)
 		switch (entry)
 		{
 		case 'Q':
-			Board[target->getRow()][target->getCol()] = new QueenPiece(curTurn, target->getRow(), target->getCol());
+			Board[target->getRow()][target->getCol()] = new QueenPiece(curTurn.getColor(), target->getRow(), target->getCol());
 			userEntryCorrect = true;
 			break;
 		case 'R':
-			Board[target->getRow()][target->getCol()] = new RookPiece(curTurn, target->getRow(), target->getCol());
+			Board[target->getRow()][target->getCol()] = new RookPiece(curTurn.getColor(), target->getRow(), target->getCol());
 			userEntryCorrect = true;
 			break;
 		case 'B':
-			Board[target->getRow()][target->getCol()] = new BishopPiece(curTurn, target->getRow(), target->getCol());
+			Board[target->getRow()][target->getCol()] = new BishopPiece(curTurn.getColor(), target->getRow(), target->getCol());
 			userEntryCorrect = true;
 			break;
 		case 'K':
-			Board[target->getRow()][target->getCol()] = new KnightPiece(curTurn, target->getRow(), target->getCol());
+			Board[target->getRow()][target->getCol()] = new KnightPiece(curTurn.getColor(), target->getRow(), target->getCol());
 			userEntryCorrect = true;
 			break;
 		default:
@@ -155,7 +155,7 @@ bool ChessBoard::movePiece(Position * origin)
 	Position * target = &target_pos;
 	ChessPiece * movingPiece = Board[origin->getRow()][origin->getCol()];
 	bool userChoseLegalTarget = false;
-	colors opponent = (curTurn == Black) ? White : Black;
+	Color opponent = (curTurn == Color(Black)) ? White : Black;
 	cout << "Move where?" << endl;
 	while (!userChoseLegalTarget)
 	{
@@ -167,15 +167,15 @@ bool ChessBoard::movePiece(Position * origin)
 		delete(Board[target->getRow()][target->getCol()]);
 	Board[target->getRow()][target->getCol()] = movingPiece;
 	Board[origin->getRow()][origin->getCol()] = nullptr;
-	if (movingPiece->getPiece() == Pawn && ((movingPiece->getColor() == Black && target->getRow() == 0) ||
-		(movingPiece->getColor() == White && target->getRow() == 7)))
+	if (movingPiece->getPiece() == Pawn && ((movingPiece->getColor() == Color(Black) && target->getRow() == 0) ||
+		(movingPiece->getColor() == Color(White) && target->getRow() == 7)))
 	{
 		delete(movingPiece);
 		createNewPiece(target);
 	}
 	else if (movingPiece->getPiece() == King)
 	{
-		if (curTurn == Black) BlackKing = *target;
+		if (curTurn == Color(Black)) BlackKing = *target;
 		else                  WhiteKing = *target;
 	}
 
@@ -183,7 +183,7 @@ bool ChessBoard::movePiece(Position * origin)
 	{
 		if (isCheckMate(opponent))
 		{
-			cout << "Checkmate!!! " << ColorStrings[curTurn] << " wins!!!" << endl;
+			cout << "Checkmate!!! " << ColorStrings[curTurn.getColor()] << " wins!!!" << endl;
 			return true;
 		}
 		cout << "Check!" << endl;
@@ -195,13 +195,13 @@ bool ChessBoard::movePiece(Position * origin)
 bool ChessBoard::nextTurn()
 {
 	Position * pieceToMove = pickUpPiece();
-	colors opponent = curTurn == Black ? White : Black;
+	colors opponent = (curTurn == Color(Black)) ? White : Black;
 	movePiece(pieceToMove);
 	if (isCheck(opponent))
 	{
 		if (isCheckMate(opponent))
 		{
-			cout << "Checkmate!!! " << ColorStrings[curTurn] << " wins!!!" << endl;
+			cout << "Checkmate!!! " << ColorStrings[curTurn.getColor()] << " wins!!!" << endl;
 			return true;
 		}
 		cout << "Check!" << endl;

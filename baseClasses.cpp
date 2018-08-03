@@ -1,6 +1,6 @@
 #include "baseClasses.h"
 
-Color::Color(colors color = White) :color(color) {};
+Color::Color(colors color) :color(color) {};
 
 colors Color::getColor()
 { 
@@ -17,6 +17,11 @@ void Color::printColor()
 	cout << ColorStrings[color]; 
 }
 
+void Color::printColorLetter()
+{
+	cout << ColorLetters[color];
+}
+
 Color& Color::operator++()
 {
 	this->color = (colors)(((int)this->color + 1) % 2);
@@ -28,6 +33,16 @@ Color Color::operator++(int)
 	Color ret(this->color);
 	++(*this);
 	return ret;
+}
+
+bool Color::operator==(Color& other)
+{
+	return (color == other.getColor());
+}
+
+bool Color::operator!=(Color& other)
+{
+	return (color != other.getColor());
 }
 
 
@@ -72,8 +87,7 @@ bool Position::getFromUser()
 }
 Position Position::operator=(Position other)
 {
-	row = other.getRow();
-	col = other.getCol();
+	this->setPosition(other.getRow(), other.getCol());
 	return *this;
 }
 

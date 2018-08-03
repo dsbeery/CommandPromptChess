@@ -9,15 +9,20 @@ using namespace std;
 enum colors { Black = 0, White = 1 };
 enum pieces { King = 0, Queen = 1, Bishop = 2, Knight = 3, Rook = 4, Pawn = 5 };
 
-const string ColorStrings[2] = { "Black","White" };
-
-const int MAX_POSITION = 7;
+const int COLORS_NUM = 2;
+const int PIECES_NUM = 6;
+const int BOARD_SIZE = 8;
+const int MAX_POSITION = BOARD_SIZE - 1;
 const int MIN_POSITION = 0;
+
+const string ColorStrings[COLORS_NUM] = { "Black","White" };
+const char ColorLetters[COLORS_NUM] = { 'B','W' };
+const char PieceLetters[PIECES_NUM] = { 'K','Q','B','H','R','P' };
 
 class Color
 {
 public:
-	Color(colors color);
+	Color(colors color = White);
 
 	colors getColor();
 
@@ -25,9 +30,14 @@ public:
 
 	void printColor();
 
+	void printColorLetter();
+
 	Color& operator++();
 
 	Color operator++(int);
+
+	bool operator==(Color& other);
+	bool operator!=(Color& other);
 
 private:
 	colors color;
