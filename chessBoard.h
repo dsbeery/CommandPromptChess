@@ -30,8 +30,7 @@ public:
 
 private:
 	ChessPiece * Board[8][8];
-	Position	 WhiteKing;
-	Position	 BlackKing;
+	Position     KingPosition[COLORS_NUM];
 	Color        curTurn;
 };
 
